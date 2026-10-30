@@ -2,7 +2,7 @@
 
 ## Baseline and plan
 
-- Private repository: `0xrouss-miden/epoch-quoter`; clean `main` at
+- Repository: `0xrouss-miden/epoch-quoter`; clean `main` at
   `9db39faea1da7d5cd8777d146a49794ed50fdb0c`; local branch `pablo/ipd-availability`.
 - Baseline: `npm run typecheck`, `npm test` (5 tests), `npm run build` passed.
   No lint script, browser runner, middleware, authentication implementation, or
@@ -140,3 +140,12 @@ product limitations are the documented public v2 estimator gaps, per-process
 request limits, and verified-registry review for newly introduced faucets. They
 do not establish maker-specific availability or guarantee settlement. Deployment
 and rollback guidance and the short Philipp summary are in `docs/ipd.md`.
+
+## Subsequent publishing authorization
+
+After the local handoff, Pablo requested committing, pushing and verifying a
+Vercel deployment. GitHub reported this repository as public, contrary to the
+original task's private-repository assumption. Pablo explicitly authorized
+pushing to the current public repository. The local verification ledger above
+records the earlier handoff; release commit and deployment state are tracked by
+Git and Vercel. Local environment files and ignored evidence are not published.

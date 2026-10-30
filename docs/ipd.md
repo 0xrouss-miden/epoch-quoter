@@ -196,10 +196,12 @@ The original Epoch adapter, catalog, defaults and lifecycle are untouched.
 
 ## Maintainer summary for Philipp
 
-The private dashboard now has an IPD panel that checks exact direction/size/limit
+The dashboard now has an IPD panel that checks exact direction/size/limit
 through mainnet `/v2/pair-price` and `/v2/swap-eta`. It includes eligible accepted
 Pragma liquidity anonymously, distinguishes unavailable depth from stale prices,
 errors and paused settlement, and reproduces the fixed-mid failure classification
 with deterministic fixtures in both directions. No orders or trades were sent.
 The estimator's maker-minimum/all-or-nothing gap remains explicit. Local checks
-and evidence are recorded privately; deployment requires separate authorization.
+are documented in the repository; raw evidence stays in the local workspace.
+Publishing was subsequently authorized, including a push to the public repository
+and Vercel deployment verification.
