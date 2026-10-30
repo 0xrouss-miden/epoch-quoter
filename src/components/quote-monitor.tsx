@@ -19,6 +19,7 @@ import {
 import type { Asset, Catalog, Quote } from "@/lib/types";
 import { displayAmount, toAtomic } from "@/lib/amount";
 import { useMonitor } from "@/lib/use-monitor";
+import { DashboardNav } from "./dashboard-nav";
 
 const pageSize = 30;
 const statusNames = {
@@ -260,6 +261,7 @@ export function QuoteMonitor({ catalog }: { catalog: Catalog }) {
             <span className="brand-secondary">Miden</span>
           </span>
         </a>
+        <DashboardNav active="epoch" />
         <a
           className="text-link"
           href="https://docs.epochprotocol.xyz/supported-chains-and-tokens"

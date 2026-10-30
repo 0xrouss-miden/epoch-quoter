@@ -10,6 +10,7 @@ colors:
   accent: "#c54922"
   accent-hover: "#a63716"
   green: "#19714c"
+  amber: "#865800"
   red: "#a83a3a"
   surface-subtle: "#fafbfc"
   control-background: "#f2f4f5"
@@ -211,3 +212,26 @@ Interactive elements receive a (2px) orange focus outline with a (3px) offset; t
 - Don't use monospace for the entire interface.
 - Don't hide both the input amount and its source token on mobile.
 - Don't use decoration or animation to imply successful quotes before a result exists.
+
+## IPD extension
+
+The IPD availability surface inherits the compact light operations dashboard: neutral page and surfaces, system typography, fine dividers, rounded controls, orange actions and focus, and inline diagnostic disclosures. Its implementation lives in `src/components/ipd-monitor.tsx` and `src/app/ipd/ipd.css`. The rules below qualify this surface only; preserve the existing Epoch components and behavior.
+
+### Status meaning
+
+Pair every colored dot with its visible status label. Each observation belongs to one offered-to-requested direction, exact amount, and limit policy.
+
+- **Available green** (`green`): Estimated full fill requires a current validated response for the exact order, a full fill in the `at_market` band, and a running executor. It remains an advisory estimate.
+- **Advisory amber** (`amber`): Estimated partial fill, Waiting for price move, and Settlement delayed. A tolerated price band waits for a favorable move; executor readiness takes precedence over positive fill amounts.
+- **Error red** (`red`): No executable liquidity, Invalid check, and Check failed. No executable liquidity describes eligible depth for the exact order and does not identify a maker outage.
+- **Neutral text** (`subtle-text`): unchecked/checking, stale, unsupported, unavailable-price, limit-mismatch, and deferred solver states. Historical amounts may remain visible with an explicit Historical label; stale results must not retain green status.
+
+### Controls and diagnostics
+
+The workflow is to choose an approximate USD preset or an exact offered token amount, set the limit policy, inspect the direction-specific estimate, and expand diagnostics. Presets are approximately $1, $10, and $100 using a USDT reference; each row supports a custom amount and Use preset reset. The compact policy disclosure exposes whole-basis-point slippage, initially 5 bps, and the zero minimum-fill step. Asset, Offering, and Status selects filter the view. Refresh, Pause, and the 60s-after-scan auto-refresh control reuse the shared button and field treatments.
+
+Keep exact token quantities and their units visible: offered amount, minimum receive, full expected receive or partial proceeds, and the partial offered portion. IPD columns align left; amount inputs retain tabular numerals. Show observation time and age together. Inline details carry validity, price classification, executor readiness, fees, capacity, source-price time, expiry policy, and bounded raw request/response data. These observations convey estimated liquidity and execution conditions without implying a reservation or settlement guarantee.
+
+### Responsive layout
+
+Desktop uses one continuous table with a minimum width of (1040px) and horizontal overflow. At (760px) and below, rows become stacked two-column grids within that same divided surface. Direction and disclosure lead each row; visible field labels accompany values, the estimate spans both columns, and amount fields fill their cell. Keep checked time and age available. Expanded diagnostics stack labels above values and wrap long identifiers; controls and footer content wrap without introducing separate floating cards.

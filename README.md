@@ -9,6 +9,12 @@ npm run dev
 
 Open http://127.0.0.1:3000. Node.js 22.18 or later is required.
 
+The **IPD** navigation destination opens `/ipd` (`/epoch/ipd` with the deployment
+base path). It checks exact order sizes against the mainnet solver's v2 accepted
+book, including eligible anonymous Pragma liquidity. It never submits a swap.
+See [IPD operator guidance and verification](docs/ipd.md) for policies, limitations,
+browser tests and the opt-in public GET smoke check.
+
 ## What it checks
 
 The app checks an explicit mainnet bridge matrix: **10 pairs, 20 directional quotes**. Optimism and cross-asset pairs are excluded. The requested pairs are:
