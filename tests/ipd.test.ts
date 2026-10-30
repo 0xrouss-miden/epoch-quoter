@@ -26,6 +26,7 @@ import {
   exactFixture,
   inputFromUrl,
   pairPriceFixture,
+  roundedEstimateFixtures,
   valuationFixture,
   type Scenario,
 } from "./fixtures/ipd";
@@ -101,7 +102,9 @@ test("success contract rejects missing, malformed and contradictory data before 
     { settlementsRunning: undefined },
     { estimatedSeconds: -1 },
     { expectedRequestedAmount: "1" },
-    { maxOfferedAmount: "1" },
+    { maxOfferedAmount: null },
+    { maxOfferedAmount: "-1" },
+    { maxOfferedAmount: (U64_MAX + 1n).toString() },
     { fillPrice: "101" },
     {
       fillStatus: "partial",
@@ -173,6 +176,107 @@ const settings = {
   priceMaxAgeMs: 30000,
 };
 
+for (const fixture of roundedEstimateFixtures)
+  test(`rounded estimate accepts ${fixture.name}`, () => {
+    const estimate = parseEstimate(fixture.estimate, fixture.input);
+    assert.equal(estimate.fillStatus, fixture.estimate.fillStatus);
+    assert.equal(classify(estimate), fixture.estimate.fillStatus);
+  });
+
+test("rounded positives still reject missing, mismatched and contradictory fields", () => {
+  for (const fixture of roundedEstimateFixtures) {
+    for (const key of Object.keys(fixture.estimate)) {
+      const missing: Record<string, unknown> = { ...fixture.estimate };
+      delete missing[key];
+      assert.throws(
+        () => parseEstimate(missing, fixture.input),
+        `missing ${key}`,
+      );
+      if (!["reason", "estimatedSeconds", "median24hSeconds"].includes(key))
+        assert.throws(
+          () =>
+            parseEstimate({ ...fixture.estimate, [key]: null }, fixture.input),
+          `null ${key}`,
+        );
+    }
+    for (const patch of [
+      { offeredFaucet: BTC },
+      { requestedFaucet: BTC },
+      { offeredAmount: "1" },
+      { requestedAmount: "1" },
+      { fillStatus: "unknown" },
+      { priceBand: "unknown" },
+      { reason: "unknown" },
+      { reason: "liquidity" },
+      { fillableOfferedAmount: "0" },
+      { fillableRequestedAmount: "0" },
+      {
+        fillableOfferedAmount: (
+          BigInt(fixture.input.offeredAmount) + 1n
+        ).toString(),
+      },
+      {
+        fillableRequestedAmount: (
+          BigInt(fixture.input.requestedAmount) + 1n
+        ).toString(),
+      },
+      { fillableRequestedAmount: (U64_MAX + 1n).toString() },
+      { settlementsRunning: false },
+      { priceBand: "tolerated" },
+      {
+        fillStatus: fixture.estimate.fillStatus === "full" ? "partial" : "full",
+      },
+    ])
+      assert.throws(
+        () => parseEstimate({ ...fixture.estimate, ...patch }, fixture.input),
+        `${fixture.name}: ${JSON.stringify(patch)}`,
+      );
+  }
+});
+
+test("partial amounts must equal the exact floor release, including above Number precision", () => {
+  const input = {
+    ...exactFixture,
+    offeredAmount: U64_MAX.toString(),
+    requestedAmount: (U64_MAX - 2n).toString(),
+  };
+  const large = {
+    input,
+    estimate: {
+      ...estimateFixture(input, "partial"),
+      fillableOfferedAmount: "9223372036854775806",
+      fillableRequestedAmount: "9223372036854775806",
+      expectedRequestedAmount: input.requestedAmount,
+    },
+  };
+  const partials = [
+    ...roundedEstimateFixtures.filter(
+      (fixture) => fixture.estimate.fillStatus === "partial",
+    ),
+    large,
+  ];
+  for (const fixture of partials) {
+    assert.equal(
+      classify(parseEstimate(fixture.estimate, fixture.input)),
+      "partial",
+    );
+    for (const delta of [-1n, 1n])
+      assert.throws(
+        () =>
+          parseEstimate(
+            {
+              ...fixture.estimate,
+              fillableOfferedAmount: (
+                BigInt(fixture.estimate.fillableOfferedAmount) + delta
+              ).toString(),
+            },
+            fixture.input,
+          ),
+        /Partial amounts disagree with the order ratio/,
+      );
+  }
+});
+
 test("fixed-mid incident fixtures: a 100.01 ask / 99.99 bid cannot clear at 100, but the sufficient-band verdict becomes full", () => {
   // These are stipulated v2 responses for the task's fee-free books. This tests
   // interpretation of both exact note ratios, not the Rust matching algorithm.
@@ -241,6 +345,51 @@ async function run(service: SolverService, input = scanInput()) {
     event.type === "result" ? [event.check] : [],
   );
 }
+
+test("service classifies rounded estimates without invalid_response", async (t) => {
+  for (const fixture of roundedEstimateFixtures)
+    await t.test(fixture.name, async (t) => {
+      let estimateCalls = 0;
+      t.mock.method(
+        globalThis,
+        "fetch",
+        async (input: string, options: RequestInit) => {
+          const url = new URL(input);
+          assert.equal(options.method, "GET");
+          assert.equal(options.cache, "no-store");
+          if (url.pathname === "/v2/pairs")
+            return Response.json(catalogFixture);
+          if (url.pathname === "/v2/pair-price")
+            return Response.json({
+              ...pairPriceFixture(
+                fixture.input.offeredFaucet,
+                fixture.input.requestedFaucet,
+              ),
+              marketPrice: fixture.estimate.marketPrice,
+              expectedPrice: fixture.estimate.expectedPrice,
+              fillPrice: fixture.estimate.fillPrice,
+              feePpm: 0,
+            });
+          assert.equal(url.pathname, "/v2/swap-eta");
+          assert.deepEqual(inputFromUrl(url), fixture.input);
+          estimateCalls++;
+          return Response.json(fixture.estimate);
+        },
+      );
+      const id = `${fixture.input.offeredFaucet}:${fixture.input.requestedFaucet}`;
+      const input = scanInput([id]);
+      input.customAmounts[id] = "1";
+      const checks = await run(new SolverService(settings), input);
+      assert.equal(checks.length, 1);
+      assert.equal(estimateCalls, 1);
+      assert.deepEqual(checks[0].input, fixture.input);
+      assert.equal(checks[0].identity, JSON.stringify(fixture.input));
+      assert.equal(checks[0].status, fixture.estimate.fillStatus);
+      assert.equal(checks[0].validity, "valid");
+      assert.equal(checks[0].errorCode, undefined);
+      assert.deepEqual(checks[0].estimate, fixture.estimate);
+    });
+});
 
 test("both directions use their own price and recheck anonymous usable depth even while prices are cached", async (t) => {
   const calls: string[] = [];

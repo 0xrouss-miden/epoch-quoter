@@ -77,6 +77,7 @@ export function estimateFixture(
   const partial = scenario === "partial";
   const offered = BigInt(input.offeredAmount),
     requested = BigInt(input.requestedAmount);
+  const partialPayment = requested / 2n;
   return {
     offeredFaucet: input.offeredFaucet,
     requestedFaucet: input.requestedFaucet,
@@ -100,12 +101,12 @@ export function estimateFixture(
     fillableOfferedAmount: none
       ? "0"
       : partial
-        ? (offered / 2n).toString()
+        ? ((offered * partialPayment) / requested).toString()
         : input.offeredAmount,
     fillableRequestedAmount: none
       ? "0"
       : partial
-        ? (((offered / 2n) * requested) / offered).toString()
+        ? partialPayment.toString()
         : input.requestedAmount,
     maxOfferedAmount:
       absent || scenario === "off_market"
@@ -125,6 +126,74 @@ export function estimateFixture(
     median24hSeconds: 11,
   };
 }
+// Stipulated v2 responses from the solver's ceiling-payment/floor-release
+// arithmetic, not executed Rust matcher tests or live trades.
+export const roundedEstimateFixtures = [
+  {
+    name: "ETH to USDT partial",
+    offeredFaucet: ETH,
+    requestedFaucet: USDT,
+    offeredAmount: "100000000",
+    requestedAmount: "3998000000",
+    price: "4000",
+    fillStatus: "partial" as const,
+    fillableOfferedAmount: "50000000",
+    fillableRequestedAmount: "1999000002",
+    maxOfferedAmount: "50000000",
+    expectedRequestedAmount: "4000000000",
+  },
+  {
+    name: "USDT to ETH partial",
+    offeredFaucet: USDT,
+    requestedFaucet: ETH,
+    offeredAmount: "1000000",
+    requestedAmount: "24987",
+    price: "0.00025",
+    fillStatus: "partial" as const,
+    fillableOfferedAmount: "500020",
+    fillableRequestedAmount: "12494",
+    maxOfferedAmount: "500000",
+    expectedRequestedAmount: "25000",
+  },
+  {
+    name: "USDT to ETH rounded full",
+    offeredFaucet: USDT,
+    requestedFaucet: ETH,
+    offeredAmount: "1000000",
+    requestedAmount: "24987",
+    price: "0.00025",
+    fillStatus: "full" as const,
+    fillableOfferedAmount: "1000000",
+    fillableRequestedAmount: "24987",
+    maxOfferedAmount: "999960",
+    expectedRequestedAmount: "25000",
+  },
+].map((fixture) => {
+  const input: ExactInput = {
+    ...exactFixture,
+    offeredFaucet: fixture.offeredFaucet,
+    requestedFaucet: fixture.requestedFaucet,
+    offeredAmount: fixture.offeredAmount,
+    requestedAmount: fixture.requestedAmount,
+  };
+  return {
+    name: fixture.name,
+    input,
+    estimate: {
+      ...estimateFixture(input, fixture.fillStatus),
+      fillableOfferedAmount: fixture.fillableOfferedAmount,
+      fillableRequestedAmount: fixture.fillableRequestedAmount,
+      maxOfferedAmount: fixture.maxOfferedAmount,
+      expectedRequestedAmount: fixture.expectedRequestedAmount,
+      marketPrice: fixture.price,
+      expectedPrice: fixture.price,
+      fillPrice: fixture.price,
+      feePpm: 0,
+      feeAmount: "0",
+      median24hSeconds: null,
+    },
+  };
+});
 export function inputFromUrl(url: URL): ExactInput {
   return {
     network: "mainnet",

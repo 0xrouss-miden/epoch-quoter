@@ -283,17 +283,16 @@ export function parseEstimate(raw: unknown, input: ExactInput): Estimate {
       (band !== "at_market" && band !== "tolerated") ||
       capacity === null ||
       fo === 0n ||
-      fr === 0n ||
-      BigInt(capacity) < fo
+      fr === 0n
     )
       throw new Error("Contradictory positive fill.");
     if (fill === "full" && (fo !== offered || fr !== requested))
       throw new Error("Full fill does not cover the order.");
     if (fill === "partial" && (fo >= offered || fr >= requested))
       throw new Error("Partial fill must leave an unfilled portion.");
-    // The note ratio can round by one requested base unit.
-    const difference = fo * requested - fr * offered;
-    if (difference > offered || difference < -offered)
+    // Partial payment releases floor(offered * paid / requested) units.
+    // Independently rounded capacity can be smaller than this release.
+    if (fill === "partial" && fo !== (offered * fr) / requested)
       throw new Error("Partial amounts disagree with the order ratio.");
   }
   if (
