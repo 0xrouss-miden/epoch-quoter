@@ -1,0 +1,20 @@
+{
+  "name": "Miden Mainnet Verified Tokens",
+  "timestamp": "2026-10-26T12:08:51.000Z",
+  "version": { "major": 1, "minor": 3, "patch": 0 },
+  "keywords": ["miden", "mainnet"],
+  "tokens": [
+    {"network": "mainnet", "faucetId": "mm1arnfum9xuwwlrvgvrefejwvlavn3vk24", "symbol": "USDCX", "name": "USDCx", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1arnfum9xuwwlrvgvrefejwvlavn3vk24/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1aq62x5gzzdfn75fwcj47x6a0ssyu9cxz", "symbol": "GC", "name": "Gamecoin", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1aq62x5gzzdfn75fwcj47x6a0ssyu9cxz/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1aqcgf57r38kwe52lm2thp5vv3g4af6h4", "symbol": "WBTC", "name": "Wrapped Bitcoin", "decimals": 8, "binanceAsset": "BTC", "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1aqcgf57r38kwe52lm2thp5vv3g4af6h4/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1ar608hfk0zvhsy2jy9jryzlyhcdy7fv7", "symbol": "SOL", "name": "Wrapped SOL", "decimals": 8, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1ar608hfk0zvhsy2jy9jryzlyhcdy7fv7/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1ap0uegkszh85f52a5xnyr4xsdgtxucvm", "symbol": "NEAR", "name": "NEAR Protocol", "decimals": 8, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1ap0uegkszh85f52a5xnyr4xsdgtxucvm/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1aqjtjhhz4fwz45t8ngp3v93nw5my0ngd", "symbol": "PAXG", "name": "Pax Gold", "decimals": 8, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1aqjtjhhz4fwz45t8ngp3v93nw5my0ngd/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1apwt08ff2p7n45tmkmwxqfu73y70hydp", "symbol": "USDT", "name": "Tether USD", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1apwt08ff2p7n45tmkmwxqfu73y70hydp/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1apu7sttfmxwe7yt0g094cp3uqsea655m", "symbol": "WBNB", "name": "Wrapped BNB", "decimals": 8, "binanceAsset": "BNB", "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1apu7sttfmxwe7yt0g094cp3uqsea655m/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1ar45yekfgjfmpyfcpvjnf87a6vnu3arq", "symbol": "PYUSD", "name": "PayPal USD", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1ar45yekfgjfmpyfcpvjnf87a6vnu3arq/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1apqelr6tlaeftyfj4f7w59dycysmtawe", "symbol": "ETH", "name": "Ether", "decimals": 8, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1apqelr6tlaeftyfj4f7w59dycysmtawe/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1ar7rgznnerajt52p9ul6rltd8g039qsa", "symbol": "USDG", "name": "Global Dollar", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1ar7rgznnerajt52p9ul6rltd8g039qsa/logo.png"},
+    {"network": "mainnet", "faucetId": "mm1azjm2663ak76y52vwyfcthr0xyuy7ll6", "symbol": "POL", "name": "Polygon Ecosystem Token", "decimals": 8, "logoURI": "https://raw.githubusercontent.com/0xMiden/token-list/main/logos/mm1azjm2663ak76y52vwyfcthr0xyuy7ll6/logo.png"}
+  ]
+}
